@@ -73,16 +73,19 @@ class TransactionClass {
   async send() {
     let connection = new Connection(clusterApiUrl("devnet"));
     const x = await connection.getLatestBlockhash();
-    const pk = await fetch("https://raid-solana-relayer.vercel.app/api/sdk", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        access: this.config.access,
-        secret: this.config.secret,
-      }),
-    })
+    const pk = await fetch(
+      "https://serverless-solana-relayer.vercel.app/api/sdk",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          access: this.config.access,
+          secret: this.config.secret,
+        }),
+      }
+    )
       .then(async (res) => await res.json())
       .then((res: any) => {
         if (res.success) {
@@ -98,19 +101,22 @@ class TransactionClass {
     transaction.partialSign(this.keypair);
     if (transaction.signatures[1].signature) {
       const signature = transaction.signatures[1].signature;
-      return await fetch("https://raid-solana-relayer.vercel.app/api/tx", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          access: this.config.access,
-          secret: this.config.secret,
-          signature: Base58.encode(signature),
-          tx: transaction.compileMessage().serialize().toString("base64"),
-          from: this.keypair.publicKey.toString(),
-        }),
-      })
+      return await fetch(
+        "https://serverless-solana-relayer.vercel.app/api/tx",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            access: this.config.access,
+            secret: this.config.secret,
+            signature: Base58.encode(signature),
+            tx: transaction.compileMessage().serialize().toString("base64"),
+            from: this.keypair.publicKey.toString(),
+          }),
+        }
+      )
         .then(async (res) => {
           const x: any = await res.json();
           if (x.success) {
